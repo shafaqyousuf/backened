@@ -10,7 +10,7 @@ const TeacherSchema = new mongoose.Schema({
     required: true,
   },
   course: {
-    type: String,
+    type: Number,
     required: true,
   },
 });

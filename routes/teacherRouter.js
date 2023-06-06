@@ -12,13 +12,43 @@ route.get("/", async (req, res) => {
       res.send(sendRes(true, result, "data found")).status(200);
     }
   } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
+});
+
+route.get("/search", async (req, res) => {
+  try {
+    let { name } = req.body;
+    if (name) {
+      let result = await teacherModel.find({
+        name: name,
+      });
+    }
+    if (!result) {
+      res.send(sendRes(false, null, "no data found")).status(400);
+    } else {
+      res.send(sendRes(true, result, "data found")).status(200);
+    }
+  } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
+});
+
+route.get("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    const result = await teacherModel.findById(id);
+    if (!result) {
+      res.send(sendRes(false, null, "required data not found")).status(400);
+    } else {
+      res.send(sendRes(true, result, "required data found")).status(200);
+    }
+  } catch (e) {
     console.log(e);
     res.send(sendRes(false, null, "internal server error")).status(400);
   }
 });
-route.get("/:id", (req, res) => {
-  res.send("Get single teacher data");
-});
+
 route.post("/", async (req, res) => {
   try {
     let { name, contact, course } = req.body;
@@ -34,7 +64,7 @@ route.post("/", async (req, res) => {
       errArr.push("Required : Course");
     }
     if (errArr.lenth > 0) {
-      res.send(sendRes(false, null, "no data found")).status(400);
+      res.send(sendRes(false, null, "Required all feilds")).status(400);
       return;
     } else {
       let obj = { name, contact, course };
@@ -43,19 +73,57 @@ route.post("/", async (req, res) => {
       if (!teacher) {
         res.send(sendRes(false, null, "no data found")).status(400);
       } else {
-        res.send(sendRes(true, teacher, "data found")).status(200);
+        res
+          .send(sendRes(true, teacher, "data posted successfully"))
+          .status(200);
       }
     }
   } catch (e) {
-    console.log(e);
     res.send(sendRes(false, null, "internal server error")).status(400);
   }
 });
-route.put("/:id", (req, res) => {
-  res.send("Edit teachers data");
+
+route.put("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let result = await teacherModel.findById(id);
+    if (!result) {
+      res.send(sendRes(false, null, "no data found")).status(400);
+    } else {
+      let updatedResult = await teacherModel.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
+      if (!updatedResult) {
+        res.send(sendRes(false, null, "no data posted")).status(400);
+      } else {
+        res
+          .send(sendRes(true, updatedResult, "Data posted successfully"))
+          .status(200);
+      }
+    }
+  } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
 });
-route.delete("/:id", (req, res) => {
-  res.send("delete teachers");
+
+route.delete("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let result = await teacherModel.findById(id);
+    if (!result) {
+      res.send(sendRes(false, null, "no data found")).status(400);
+      return;
+    } else {
+      let delResult = await teacherModel.findByIdAndDelete(id);
+      if (!delResult) {
+        res.send(sendRes(false, null, "no data found")).status(400);
+      } else {
+        res.send(sendRes(true, [], "data deleted successfully")).status(200);
+      }
+    }
+  } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
 });
 
 module.exports = route;

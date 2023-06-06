@@ -1,60 +1,19 @@
 const express = require("express");
 const route = express.Router();
-const studentModel = require("../models/studentModel");
-const {sendRes} = require('../helper/helper')
+const StudentController = require("../controllers/studentcontroller");
 
-route.get("/", async (req, res) => {
-  try {
-    const result = await studentModel.find();
-    if (!result) {
-      res.send(sendRes(false, null, "No Data")).status(404);
-    } else {
-      res.send(sendRes(true, result, "found")).status(200);
-    }
-  } catch (e) {
-    console.log(e);
-    res.send(sendRes(false, null, "no data", err)).status(400);
-  }
-});
+route.get("/", StudentController.get);
 
-route.get("/:id", (req, res) => {
-  res.send("Get single students data");
-});
+route.get("/search", StudentController.searchStd);
 
-route.post("/", async (req, res) => {
-  let { firstName, lastName, contact, course } = req.body;
-  let errArr = [];
+route.get("/:id", StudentController.getById);
 
-  if (!firstName) {
-    errArr.push("Required: First Name");
-  }
-  if (!contact) {
-    errArr.push("Required: Contact");
-  }
-  if (!course) {
-    errArr.push("Required: Course");
-  }
-  if (errArr.length > 0) {
-    res.send(sendRes(false, errArr, "Requird all feilds")).status(400);
-    return;
-  } else {
-    let obj = { firstName, lastName, contact, course };
-    let student = new studentModel(obj);
-    await student.save();
-    if (!student) {
-      res.send(sendRes(false, null, "internal server error")).status(400);
-    } else {
-      res.send(sendRes(true, student, "saved successfully")).status(200);
-    }
-  }
-});
+route.post("/", StudentController.post);
 
-route.put("/:id", (req, res) => {
-  res.send("Edit students data");
-});
+route.post("/searchStd", StudentController.searchWithPagination);
 
-route.delete("/:id", (req, res) => {
-  res.send("delete students");
-});
+route.put("/:id", StudentController.put);
+
+route.delete("/:id", StudentController.del);
 
 module.exports = route;

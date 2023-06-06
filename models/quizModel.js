@@ -1,30 +1,32 @@
 const mongoose = require("mongoose");
 
-const StudentSchema = new mongoose.Schema({
-  firstName: {
+const QuizSchema = new mongoose.Schema({
+  question: {
     type: String,
     required: true,
   },
-  lastName: {
+  answer: {
     type: String,
     required:true,
   },
-  contact: {
+  opt1: {
     type: String,
     required: true,
   },
-  email: {
+  opt2: {
     type: String,
+    required:true
   },
-  course: {
-    type: Number,
+  opt3: {
+    type: String,
     required:true,
   },
-  password: {
+  opt4: {
     type: String,
+    required:true
   },
 });
 
-const studentModel = mongoose.model("student", StudentSchema);
+const quizModel = mongoose.model("quiz", QuizSchema);
 
-module.exports = studentModel;
+module.exports = quizModel;

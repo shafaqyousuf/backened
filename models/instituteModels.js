@@ -5,13 +5,12 @@ const InstituteSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  adress: {
+  address: {
     type: String,
     required: true,
   },
   shortName: {
     type: String,
-    required: true,
   },
   telephone: {
     type: String,

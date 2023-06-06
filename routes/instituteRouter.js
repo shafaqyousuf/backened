@@ -15,21 +15,48 @@ route.get("/", async (req, res) => {
     res.send(sendRes(false, null, "internal server error")).status(400);
   }
 });
-route.get("/:id", (req, res) => {
-  res.send("Get single institute data");
+
+route.get("/search", async (req, res) => {
+  try {
+    let { name } = req.body;
+    if (name) {
+      let result = await instituteModel.find({
+        name: name,
+      });
+      if (!result) {
+        res.send(sendRes(false, null, "no data found")).status(400);
+      } else {
+        res.send(sendRes(true, result, "required data found")).status(200);
+      }
+    }
+  } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
 });
+
+route.get("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let institute = await instituteModel.findById(id);
+    if (!institute) {
+      res.send(sendRes(false, null, "no data found")).status(400);
+    } else {
+      res.send(sendRes(true, institute, "data found")).status(200);
+    }
+  } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
+});
+
 route.post("/", async (req, res) => {
   try {
-    let { name, adress, shortName, telephone } = req.body;
+    let { name, address, telephone } = req.body;
     let errArr = [];
     if (!name) {
       errArr.push("Required : Name");
     }
-    if (!adress) {
-      errArr.push("Required : Adress");
-    }
-    if (!shortName) {
-      errArr.push("Required : Short Name");
+    if (!address) {
+      errArr.push("Required : Address");
     }
     if (!telephone) {
       errArr.push("Required : Telephone");
@@ -38,7 +65,7 @@ route.post("/", async (req, res) => {
       res.send(sendRes(false, errArr, "required all feilds")).status(400);
       return;
     } else {
-      let obj = { name, adress, shortName, telephone };
+      let obj = { name, address, telephone };
       let institute = new instituteModel(obj);
       await institute.save();
       if (!institute) {
@@ -51,11 +78,45 @@ route.post("/", async (req, res) => {
     res.send(sendRes(false, null, "internal server error")).status(400);
   }
 });
-route.put("/:id", (req, res) => {
-  res.send("Edit institute data");
+
+route.put("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let result = await instituteModel.findById(id);
+    if (!result) {
+      res.send(sendRes(false, null, "no data found")).status(400);
+    } else {
+      let updateResult = await instituteModel.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
+      if (!updateResult) {
+        res.send(sendRes(false, null, "no data found")).status(400);
+      } else {
+        res.send(sendRes(true, updateResult, "data posted")).status(200);
+      }
+    }
+  } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
 });
-route.delete("/:id", (req, res) => {
-  res.send("delete institute");
+
+route.delete("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let result = await instituteModel.findById(id);
+    if (!result) {
+      res.send(sendRes(false, null, "no data found")).status(400);
+    } else {
+      let delResult = await instituteModel.findByIdAndDelete(id);
+      if (!delResult) {
+        res.send(sendRes(false, null, "no data found")).status(400);
+      } else {
+        res.send(sendRes(false, [], "data deleted successfully")).status(200);
+      }
+    }
+  } catch (e) {
+    res.send(sendRes(false, null, "internal server error")).status(400);
+  }
 });
 
 module.exports = route;

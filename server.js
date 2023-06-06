@@ -106,27 +106,24 @@
 // });
 
 // app.listen(4000);
-
 const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const studentRouter = require("./routes/studentRouter");
 const instituteRouter = require("./routes/instituteRouter");
 const teacherRouter = require("./routes/teacherRouter");
-const todoRouter = require("./routes/todoRouter");
-const courseRouter = require("./routes/courseRouter");
+const UserRouter = require("./routes/userRouter");
+const QuizRouter = require("./routes/quizRouter");
 require("dotenv").config();
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/student", studentRouter);
-app.use("/api/institute", instituteRouter);
 app.use("/api/teacher", teacherRouter);
-app.use("/api/todo", todoRouter);
-// app.use("/api/course", courseRouter);
-
-app.get("/", (req, res) => {
-  res.send("Server Started");
-});
+app.use("/api/institute", instituteRouter);
+app.use("/api/user", UserRouter);
+app.use("/api/quiz", QuizRouter);
 
 mongoose
   .connect(process.env.MONGO_URI)
